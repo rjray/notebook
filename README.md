@@ -17,5 +17,9 @@ Markdown, or even move to different format altogether
 may take one of the domains I'm currently not making use of and go full-on
 blog.
 
+The underlying tools are not the point, and not *that* important. But in that
+vein, that majority of my coding and writing is done in Emacs, which will no
+doubt guide my choice of other tools.
+
 And maybe, no one else will ever read any of this anyway.
 
