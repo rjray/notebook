@@ -9,7 +9,7 @@ Tags: #clojure #advent #algorithms #tsp
 I thoroughly enjoy taking part in the yearly [Advent of
 Code](https://adventofcode.com/) programming challenge. My first year was 2018,
 and I've done it each year since (except for 2021, when I was steeped in exams
-for graduate classes in my MSCS program). I use AoC to practive my skills in
+for graduate classes in my MSCS program). I use AoC to practice my skills in
 the [Clojure](http://clojure.org/) programming language (a Lisp dialect written
 in Java and running on the JVM).
 
@@ -124,7 +124,7 @@ on my 2015-era MacBook Pro was 780.277ms for part 1 and 790.876ms for part 2.
 But I was absolutely certain that I could do better, and equally certain that
 the path to "better" was through the dynamic programming TSP solution.
 
-(As a side note: the run-times could have been roughly halved if I took the
+(As a side note: the run-times could have possibly been reduced if I took the
 time and effort to recognize that two permutations that are exact reverses of
 each other would have the same cost. The would have required caching each
 permutation and not calculating a cost for any permutation for which `(reverse
@@ -164,6 +164,8 @@ sequences of pairs:
 (1 2 3 4 1) => ((1 2) (2 3) (3 4) (4 1))
 ```
 
+and
+
 ```clojure
 (3 4 1 2 3) => ((3 4) (4 1) (1 2) (2 3))
 ```
@@ -189,7 +191,7 @@ fixed vertex being something other than 1. (At this point I also dropped the
 practice of numbering from 1 rather than 0.) In this file, the functions are
 parameterized to allow for choosing between `min` and `max` for the selection
 operation (and `Integer/MAX_VALUE` versus `Integer/MIN_VALUE` for
-positive/negative infinty values.
+positive/negative infinty values).
 
 Running this yielded running times of 83.789ms for part 1 and 75.497ms for
 part 2. These times are roughly 10% of their corresponding brute-force times.
@@ -204,7 +206,7 @@ over. Not all variable names will be clear, so I'll try to explain them as I
 go.
 
 (Disclaimer: I am not an expert Clojure programmer. There are likely several
-places where something could have been done more concise, or in a more
+places where something could have been done more concisely, or in a more
 idiomatic manner. Also, I write for clarity over terseness, on the assumption
 that I'll want to go back and read the code at some future point.)
 
@@ -235,7 +237,7 @@ calculate the new (current) rows. The previous rows are discarded, and the new
 rows become the new "previous" for the next iteration.
 
 At the end, there is just one row left in the "current" set, the row for which
-the set-index is *S - {anchor}*. That row will have the total cost values
+the set-index is *(S - {anchor})*. That row will have the total cost values
 based on each non-anchor element, and the aggregate function will be applied to
 these.
 
@@ -335,7 +337,7 @@ starting vertex *m*.
 The `create-sets` function is a subtle part of what makes Clojure such a
 well-suited language for this problem. Here, we create all the subsets of *S*
 (where *S* is the set of numbers 0..*(n-1)*), but we only create the ones that
-contain *m*. This is done by creating all sets without *m*, then `cons`ing *m*
+contain *m*. This is done by creating all sets without *m*, then `cons`'ing *m*
 into all of them. The resulting sequence of sets is then grouped by the count
 of their elements. The `reduce` block converts that result into a vector such
 that each index *i* points to all sets that have *i+1* elements, accounting for
@@ -497,4 +499,4 @@ expense of readability, but I am not motivated by code-golfing.
 What matters, is that even running the DP algorithm *n* times, for a value of
 *n = 8* it took only 10% of the time that the brute-force algorithm did. As *n*
 grows, this gap will become much more pronounced, as the brute force will be
-bounded by O(*n!*) while the DP code will be bounded by O(*n^3*).
+bounded by O(*n!*) while the DP code will be bounded by O(*n<sup>3</sup>*).
