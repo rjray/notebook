@@ -67,7 +67,7 @@ It wasn't the correct answer. In fact, it was *too high!*
 
 This situation was a simpler one than the typical application of Bellman-Ford:
 there are no negative edges, the graph is fully-connected, and the edges are
-not directed (the weight of edge $(A, B)$ is the same as that of $(B, A)$).
+not directed (the weight of edge $(A, B)$ is the same as that of $`(B, A)`$).
 These conditions also applied to the assignment problem in the Coursera class.
 
 The basic gist of the algorithm, as applied to TSP, is:
