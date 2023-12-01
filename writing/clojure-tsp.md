@@ -67,21 +67,21 @@ It wasn't the correct answer. In fact, it was *too high!*
 
 This situation was a simpler one than the typical application of Bellman-Ford:
 there are no negative edges, the graph is fully-connected, and the edges are
-not directed (the weight of edge *(A, B)* is the same as that of *(B, A)*).
+not directed (the weight of edge $(A, B)$ is the same as that of $(B, A)$).
 These conditions also applied to the assignment problem in the Coursera class.
 
 The basic gist of the algorithm, as applied to TSP, is:
 
-1. Choose a vertex *v* as the starting point. In the original code, vertices
-   are numbered from 1 to *n*, so for the sake of easier looping the first
+1. Choose a vertex $v$ as the starting point. In the original code, vertices
+   are numbered from 1 to $n$, so for the sake of easier looping the first
    vertex (1) is chosen.
-2. Use DP/Bellman-Ford to find the shortest paths rooted at *v*. There will be
-   *n-1* different candidate paths.
+2. Use DP/Bellman-Ford to find the shortest paths rooted at $v$. There will be
+   $n-1$ different candidate paths.
 3. Over the paths from the previous step, find the shortest path that includes
-   a return segment back to *v*.
+   a return segment back to $v$.
 
 In this case, it should have been enough to take the lowest-score (shortest)
-path while skipping the "return segment back to *v*" step. Such was not part of
+path while skipping the "return segment back to $v$" step. Such was not part of
 the puzzle. This is what I had done, but it had given the wrong answer.
 
 (There will be more detail here, filled in at a later point.)
@@ -146,7 +146,7 @@ information: the correct answer.
 Using a variety of debugging approaches, both interjected `(prn ...)`
 statements and the [CIDER](https://cider.mx/) step-wise debugger, I walked
 through the code time and time again. After I-don't-know-how-many iterations,
-something hit me: the code was producing the *n-1* candidate paths (starting at
+something hit me: the code was producing the $n-1$ candidate paths (starting at
 vertex 1) and picking the shortest of them (without adding a link back to the
 starting vertex). But what if the correct solution *doesn't* start at 1?
 
@@ -184,7 +184,7 @@ expect it to give the correct answer.
 To address this, the only approach I could think of was to iterate over the DP
 algorithm for each vertex as a starting point. I would then take the minimum
 (or maximum, for part 2) resulting cost. This sounds very brute-force-ish, I
-will admit. But I suspected that even running the full DP process *n* times
+will admit. But I suspected that even running the full DP process $n$ times
 should still out-perform the original solution.
 
 This lead to the file [day09bis.clj](clojure-tsp/day09bis.clj). The hardest
@@ -200,8 +200,8 @@ part 2. These times are roughly 10% of the corresponding brute-force times.
 
 ## But How Does the Code *Work?*
 
-Let's look at the `day09bis.clj` ([meaning of
-"bis"](https://www.merriam-webster.com/dictionary/bis)) file, more or less
+Let's look at the `day09bis.clj`
+(["bis"](https://www.merriam-webster.com/dictionary/bis)) file, more or less
 line-by-line. There are some large-ish block-comments in this file (in case I
 need to understand a working TSP implementation in the future) that I'll skip
 over. Not all variable names will be clear, so I'll try to explain them as I
@@ -216,16 +216,16 @@ that I'll want to go back and read the code at some future point.)
 
 The basic algorithm here is [Dynamic
 Programming](https://en.wikipedia.org/wiki/Dynamic_programming). In this case,
-the DP approach would create a matrix where the rows run from 0 to *n*
-(inclusive), where *n* is the number of vertices. The number of columns would
-generally be the number of distinct subsets of *S*, where *S* is the set of
-numbers from 0 to *n-1*. However, two optimizations are done to reduce memory
-usage:
+the DP approach would create a matrix where the rows run from 0 to $n$
+(inclusive), where $n$ is the number of vertices. The number of columns would
+generally be the number of distinct subsets of $S$, where $S$ is the set of
+numbers $\lbrace0, ..., n-1\rbrace$. However, two optimizations are done to
+reduce memory usage:
 
-1. Not all possible subsets of *S* are used, only those that contain the given
+1. Not all possible subsets of $S$ are used, only those that contain the given
    "anchor" vertex
-2. Not all columns of the matrix are allocated. For a given row *m*, only the
-   columns whose sets have *m* elements are ever allocated.
+2. Not all columns of the matrix are allocated. For a given row $m$, only the
+   columns whose sets have $m$ elements are ever allocated.
 
 At each step of the outer-most loop (not counting the meta-loop for running the
 DP code for one specific anchor vertex), the previous row is used to calculate
@@ -233,9 +233,9 @@ the new (current) row. The previous row is discarded, and the new row becomes
 the new "previous" for the next iteration.
 
 At the end, the final row is left with just one column allocated, the column
-for which the set-index is *(S-{x})* (*x* being the anchored vertex). That
-column will have the total cost values based on each non-anchor element, and
-the aggregate function will be applied to these.
+for which the set-index is $S$. That column will have the total cost values
+based on each non-anchor element, and the aggregate function will be applied to
+these.
 
 ### Preamble
 
@@ -326,18 +326,18 @@ covered together.
 ```
 
 Starting with `n-sans-m`, we have a simple function that returns the list of
-numbers from 0 to *n-1*, with the number *m* removed. This is important because
-we'll be running the DP algorithm *n* times, each time with a different
-starting vertex *m*.
+numbers from 0 to $n-1$, with the number $m$ removed. This is important because
+we'll be running the DP algorithm $n$ times, each time with a different
+starting vertex $m$.
 
 The `create-sets` function is a subtle part of what makes Clojure such a
-well-suited language for this problem. Here, we create all the subsets of *S*
-(where *S* is the set of numbers 0..*(n-1)*), but we only create the ones that
-contain *m*. This is done by creating all sets without *m*, then `cons`'ing *m*
+well-suited language for this problem. Here, we create all the subsets of $S$
+($S = \lbrace0, ..., n-1\rbrace$), but we only create the ones that
+contain $m$. This is done by creating all sets without $m$, then `cons`'ing $m$
 into all of these. The resulting sequence of sets is then grouped by the count
 of their elements. The `reduce` block converts that result into a vector such
-that each index *i* points to all sets that have *i+1* elements, accounting for
-*m*.
+that each index $i$ points to all sets that have $i+1$ elements, accounting for
+$m$.
 
 Next, `create-column` creates a single colum for the matrix that would be used
 for the DP approach. It takes `sets` and `template`, and creates a
@@ -348,7 +348,7 @@ map structure rather than a vector, so that a set can be used as the index.
 Lastly, `get-final-answer` finds the correct answer (for the iteration of TSP).
 Here, `f` is the aggregate function to be applied to the collected totals.
 `m-cur` is the final column-function from the DP algorithm (more on that later)
-and `sets` is the one-element list of "subsets" of *S* that equal *S*.
+and `sets` is the one-element list of "subsets" of $S$ that is just $S$.
 
 ### The loop-control functions
 
@@ -402,7 +402,7 @@ respectively. `f` is the aggregate function and `s` is the outlier value that
 is used in the template creation to represent one of $\pm\infty$. It creates
 `template` as a vector of `nil` values with `s` in the `start` slot, `sets` as
 the indexed collection of subsets, and `m-prev` as the initial "previous" row
-of the DP matrix. The `loop` construct runs `m` from 1 to *n* (inclusive) and
+of the DP matrix. The `loop` construct runs `m` from 1 to $n$ (inclusive) and
 carries over `m-prev` between iterations. This is a place where I could have
 save some keystrokes: The `let` is unnecessary in that the s-expression it
 binds could be plugged directly into the `recur` expression in place of
@@ -412,7 +412,7 @@ The `sets-loop` function performs what is the middle of the three loops
 described by the DP algorithm. It takes the aggregate function `f`, the
 starting vertex `st`, the "previous" row of the matrix `m-prev`, the
 "current" matrix row (that is being filled in) `m-cur`, the list of subsets
-of *S* based on the value of *m* in the previous function's loop, and finally
+of $S$ based on the value of $m$ in the previous function's loop, and finally
 the edge weights. With all of this, it just `loop`'s over the list of sets,
 calling the `j-loop` function for each individual set in the list.
 
@@ -437,7 +437,7 @@ parameterized as `f`.
 ### The (small) `tsp` function
 
 In the original TSP code, this function was essentially what is now `tsp-core`.
-Here, it makes *n* calls to `tsp-core`.
+Here, it makes $n$ calls to `tsp-core`.
 
 ```clojure
 (defn- tsp [f s graph]
@@ -448,7 +448,7 @@ Here, it makes *n* calls to `tsp-core`.
 
 The key element here is the use of `partial` to construct a partial application
 of `tsp-core` with `n`, `weights`, `f` and `s` locked in. This partial will be
-called with each value from 0 to *n-1* via `map`, and the "best" value (either
+called with each value from 0 to $n-1$ via `map`, and the "best" value (either
 minimum or maximum) will be pulled out through application of the aggregate
 function `f`.
 
@@ -491,10 +491,10 @@ basic size of the solutions: 41 lines for the brute-force solution and 87 lines
 for the DP/Bellman-Ford solution. The latter could be squeezed a bit at the
 expense of readability, but I am not motivated by code-golfing.
 
-What matters, is that even running the DP algorithm *n* times, for a value of
-*n = 8* it took only 10% of the time that the brute-force algorithm did. As *n*
+What matters, is that even running the DP algorithm $n$ times, for a value of
+*n = 8* it took only 10% of the time that the brute-force algorithm did. As $n$
 grows, this gap will become much more pronounced, as the brute force will be
-bounded by O(*n!*) while the DP code will be bounded by O(*n<sup>3</sup>*).
+bounded by O($n!$) while the DP code will be bounded by O($n^3$).
 
 I am a little "itchy" about the number of parameters passed down from loop to
 loop, between `tsp` and `f-val-over-s`. There may be better ways to do this,
