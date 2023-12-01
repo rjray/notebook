@@ -13,12 +13,13 @@ for graduate classes in my MSCS program). I use AoC to practice my skills in
 the [Clojure](http://clojure.org/) programming language (a Lisp dialect written
 in Java and running on the JVM).
 
-The 2023 challenge will begin in just a few days. I generally have a problem
-early on in my effort: I don't get to use Clojure throughout the year, so each
-December I feel like I'm practically starting over. I spend the first few days
-madly going through the [documentation](https://clojuredocs.org/) to re-learn
-what I had been comfortable with a year earlier. It's frustrating, of course,
-and it slows me down on the early days that should be the easiest.
+The 2023 challenge will be well underway by the time I publish this. I
+generally have a problem early on in my effort: I don't get to use Clojure
+throughout the year, so each December I feel like I'm practically starting
+over. I spend the first few days madly going through the
+[documentation](https://clojuredocs.org/) to re-learn what I had been
+comfortable with a year earlier. It's frustrating, of course, and it slows me
+down on the early days that should be the easiest.
 
 With this in mind, I decided to do a "practice run" this year prior to the
 start of the new challenge. I chose to do 2015 (the first year) as fast as I
@@ -50,32 +51,33 @@ and began to examine it to remember what I had done. This implementation used
 a dynamic programming approach with a variation of the [Bellman-Ford
 algorithm](https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm).
 
-Remembering what I did that far back was a challenge, of course. There are some
-comments in that code, but there are never enough. After a bit, though, I had
-determined what I needed to do in order to adapt the code to the input I had
-for the AoC puzzle. After some adjustments, I ran it on the example given in
-the puzzle and go the correct answer. I then ran it on the puzzle input and
-looked at the result; it felt too low. There were 8 towns in the dataset, and
-it seemed like the number should just be higher than what I had. I spent time
-running the algorithm by hand with pencil and paper, and decided that it must
-be the correct answer.
+Remembering what I did that far back was it's own challenge, of course. There
+are some comments in that code, but never enough. After a bit, though, I had
+determined what I needed to do in order to adapt the code to the input for the
+AoC puzzle. After some adjustments, I ran it on the example given in the puzzle
+and go the correct answer. I then ran it on the puzzle input and looked at the
+result; it felt too low. There were 8 towns in the dataset, and it seemed like
+the number should just be higher than what I had. I spent time running the
+algorithm by hand with pencil and paper, and decided that it must be the
+correct answer.
 
-It wasn't the correct answer. In fact, it was *too high*!
+It wasn't the correct answer. In fact, it was *too high!*
 
 ## Explanation of the Algorithm
 
 This situation was a simpler one than the typical application of Bellman-Ford:
-there are no negative edges, the graph is fully-connected, and the weight of
-edge *(A, B)* is the same as that of *(B, A)*. These conditions also applied to
-the assignment problem in the Coursea class.
+there are no negative edges, the graph is fully-connected, and the edges are
+not directed (the weight of edge *(A, B)* is the same as that of *(B, A)*).
+These conditions also applied to the assignment problem in the Coursera class.
 
 The basic gist of the algorithm, as applied to TSP, is:
 
 1. Choose a vertex *v* as the starting point. In the original code, vertices
    are numbered from 1 to *n*, so for the sake of easier looping the first
    vertex (1) is chosen.
-2. Use DP/Bellman-Ford to find the shortest paths rooted at *v*.
-3. Over the values from the previous step, find the shortest path that includes
+2. Use DP/Bellman-Ford to find the shortest paths rooted at *v*. There will be
+   *n-1* different candidate paths.
+3. Over the paths from the previous step, find the shortest path that includes
    a return segment back to *v*.
 
 In this case, it should have been enough to take the lowest-score (shortest)
@@ -110,10 +112,10 @@ package, specifically the `permutations` function:
 Looking at `brute-force` first, `fun` is a function to apply (one of `min` or
 `max`) because part 2 of the puzzle was to find the longest path. The `ival`
 parameter is the initial value to use with `reduce` (again, because of the
-min/max nature of the two halves). The two destructured parameters, `[n
-edges]`, represent the number of vertices and the map containing the
-edge-weights for each possible pair. Since this code was derived from the
-previous TSP attempt, I had left the vertices numbered from 1 rather than 0.
+min/max nature of the two parts). The two destructured parameters, `[n edges]`,
+represent the number of vertices and the map containing the edge-weights for
+each possible pair. Since this code was derived from the previous TSP attempt,
+I had left the vertices numbered from 1 rather than 0.
 
 The `calc-cost` function is used to calculate the total cost for a permutation.
 It does this by first partitioning the list of vertices into overlapping pairs.
@@ -126,8 +128,8 @@ the path to "better" was through the dynamic programming TSP solution.
 
 (As a side note: the run-times could have possibly been reduced if I took the
 time and effort to recognize that two permutations that are exact reverses of
-each other would have the same cost. The would have required caching each
-permutation and not calculating a cost for any permutation for which `(reverse
+each other would have the same cost. This would have required caching each
+permutation and not calculating a cost for any permutation in which `(reverse
 p)` was already in the cache. But the `calc-cost` function was not the biggest
 source of processing time, the calculation and iteration of 8! permutations
 was. Add in the overhead of maintaining the cache and testing each element for
@@ -144,15 +146,15 @@ information: the correct answer.
 Using a variety of debugging approaches, both interjected `(prn ...)`
 statements and the [CIDER](https://cider.mx/) step-wise debugger, I walked
 through the code time and time again. After I-don't-know-how-many iterations,
-something hit me: the code was producing one candidate path (starting at
-vertex 1) and totalling the distance over it. This is because the search was
-being anchored at vertex 1. What if the correct solution *doesn't* start at 1?
+something hit me: the code was producing the *n-1* candidate paths (starting at
+vertex 1) and picking the shortest of them (without adding a link back to the
+starting vertex). But what if the correct solution *doesn't* start at 1?
 
 ### The problem
 
-See, the original application of Bellman-Ford to this connected the path back
-to vertex 1 at the end. This is because for the TSP problem we are looking for
-a closed loop, we end where we started. This works, because the final answer
+The original application of Bellman-Ford to this connected the path back to
+vertex 1 at the end. This is because for the TSP problem we are looking for a
+closed loop, we end where we started. This works, because the final answer
 works for any rotation of the vertices as long as the order is maintained. In
 other words, `(1 2 3 4)` and and `(3 4 1 2)` would yield the same cost (once
 the closing link is added). To illustrate, take the two examples and append the
@@ -183,20 +185,20 @@ To address this, the only approach I could think of was to iterate over the DP
 algorithm for each vertex as a starting point. I would then take the minimum
 (or maximum, for part 2) resulting cost. This sounds very brute-force-ish, I
 will admit. But I suspected that even running the full DP process *n* times
-would still out-perform the original solution.
+should still out-perform the original solution.
 
 This lead to the file [day09bis.clj](clojure-tsp/day09bis.clj). The hardest
 part of this was re-factoring the primary steps and loops to deal with the
-fixed vertex being something other than 1. (At this point I also dropped the
-practice of numbering from 1 rather than 0.) In this file, the functions are
-parameterized to allow for choosing between `min` and `max` for the selection
-operation (and `Integer/MAX_VALUE` versus `Integer/MIN_VALUE` for
+fixed vertex being something other than 0. (At this point I had also dropped
+the practice of numbering from 1 rather than 0.) In this file, the functions
+are parameterized to allow for choosing between `min` and `max` for the
+selection operation (and `Integer/MAX_VALUE` versus `Integer/MIN_VALUE` for
 positive/negative infinty values).
 
 Running this yielded running times of 83.789ms for part 1 and 75.497ms for
-part 2. These times are roughly 10% of their corresponding brute-force times.
+part 2. These times are roughly 10% of the corresponding brute-force times.
 
-## But How Does the Code Work?
+## But How Does the Code *Work?*
 
 Let's look at the `day09bis.clj` ([meaning of
 "bis"](https://www.merriam-webster.com/dictionary/bis)) file, more or less
@@ -210,36 +212,30 @@ places where something could have been done more concisely, or in a more
 idiomatic manner. Also, I write for clarity over terseness, on the assumption
 that I'll want to go back and read the code at some future point.)
 
-(Second disclaimer: Due to a certain amount of haste on my part, coupled with a
-skewed initial understanding of things when I wrote the original TSP code,
-there are several functions with the word `column` in their name. But they are
-actually used to create/manipulate *rows* in the underlying matrix. I guess it
-depends on how you vizualize the matrix, of course.)
-
 ### Basic algorithm
 
 The basic algorithm here is [Dynamic
 Programming](https://en.wikipedia.org/wiki/Dynamic_programming). In this case,
-the DP approach would create a matrix where the columns run from 0 to *n*
-(inclusive), where *n* is the number of vertices. The number of rows would
+the DP approach would create a matrix where the rows run from 0 to *n*
+(inclusive), where *n* is the number of vertices. The number of columns would
 generally be the number of distinct subsets of *S*, where *S* is the set of
 numbers from 0 to *n-1*. However, two optimizations are done to reduce memory
 usage:
 
 1. Not all possible subsets of *S* are used, only those that contain the given
    "anchor" vertex
-2. Not all rows of the matrix are kept, only the previous set of rows and the
-   set currently being computed
+2. Not all columns of the matrix are allocated. For a given row *m*, only the
+   columns whose sets have *m* elements are ever allocated.
 
 At each step of the outer-most loop (not counting the meta-loop for running the
-DP code for one specific anchor vertex), the previous rows are used to
-calculate the new (current) rows. The previous rows are discarded, and the new
-rows become the new "previous" for the next iteration.
+DP code for one specific anchor vertex), the previous row is used to calculate
+the new (current) row. The previous row is discarded, and the new row becomes
+the new "previous" for the next iteration.
 
-At the end, there is just one row left in the "current" set, the row for which
-the set-index is *(S - {anchor})*. That row will have the total cost values
-based on each non-anchor element, and the aggregate function will be applied to
-these.
+At the end, the final row is left with just one column allocated, the column
+for which the set-index is *(S-{x})* (*x* being the anchored vertex). That
+column will have the total cost values based on each non-anchor element, and
+the aggregate function will be applied to these.
 
 ### Preamble
 
@@ -285,15 +281,15 @@ representation of a graph:
 ```
 
 In the first function, `parse-line`, a single line of input is turned into a
-list of *(city1, city2, distance)*. There's nothing really noteworthy here; the
-structure of the input lines meant that `clojure.string/split` could be used in
-this case to get everything needed out of a line.
+tuple of *(city1, city2, distance)*. There's nothing really noteworthy here;
+the structure of the input lines meant that `clojure.string/split` could be
+used in this case to get everything needed out of a line.
 
 The `build-graph` function takes the sequence of tuples produced by the
 previous function and turns them into a graph structure. The code first takes
 all of the tuples and extracts a list of distinct city-names from it. Then this
-mapping is used to convert the names to numeric indices as each pair's
-cost-value is recorded as an edge.
+group is used to convert the names to numeric indices as each pair's cost-value
+is recorded as an edge.
 
 The conversion of the cities from names to numbers was needed so that the key
 loops of the algorithm could operate on numbers rather than repeatedly
@@ -338,27 +334,27 @@ The `create-sets` function is a subtle part of what makes Clojure such a
 well-suited language for this problem. Here, we create all the subsets of *S*
 (where *S* is the set of numbers 0..*(n-1)*), but we only create the ones that
 contain *m*. This is done by creating all sets without *m*, then `cons`'ing *m*
-into all of them. The resulting sequence of sets is then grouped by the count
+into all of these. The resulting sequence of sets is then grouped by the count
 of their elements. The `reduce` block converts that result into a vector such
 that each index *i* points to all sets that have *i+1* elements, accounting for
 *m*.
 
-Next, `create-column` creates a single row for the matrix that would be used
+Next, `create-column` creates a single colum for the matrix that would be used
 for the DP approach. It takes `sets` and `template`, and creates a
 pseudo-vector of all the sets (as indices) pointing to copies of `template`.
-The purpose of this will be explained more, later.
+The purpose of this will be explained more, later. Note that this is actually a
+map structure rather than a vector, so that a set can be used as the index.
 
-Lastly, `get-final-answer` finds the correct answer. Here, `f` is the aggregate
-function to be applied to the collected totals. `m-cur` is the final
-row-function from the DP algorithm (more on that later) and `sets` is a
-one-element list of "subsets" of *S* that equal *S*. I.e., the one in which all
-elements are present.
+Lastly, `get-final-answer` finds the correct answer (for the iteration of TSP).
+Here, `f` is the aggregate function to be applied to the collected totals.
+`m-cur` is the final column-function from the DP algorithm (more on that later)
+and `sets` is the one-element list of "subsets" of *S* that equal *S*.
 
 ### The loop-control functions
 
 These four functions represent the different loops that make up the DP
 algorithm for solving TSP. Because Clojure requires functions to be defined
-before being referenced, they are listed from inner-most to outer-most and will
+before being referenced, they are listed from inner-most to outer-most but will
 be explained in reverse order.
 
 ```clojure
@@ -403,15 +399,14 @@ Starting with `tsp-core`, this is the "main" loop of the algorithm. This runs
 the basic DP/Bellman-Ford algorithm with `start` as the anchored vertex. The
 `n` and `weights` variables are the number of vertices and the edge-weights,
 respectively. `f` is the aggregate function and `s` is the outlier value that
-is used in the template creation to represent one of positive or negative
-infinity. It creates `template` as a vector of `nil` values with `s` in the
-`start` slot, `sets` as the indexed collection of subsets, and `m-prev` as the
-initial "previous" row of the DP matrix. The `loop` construct runs `m` from
-1 to *n* (inclusive) and carries over `m-prev` between iterations. This is a
-place where I could have save some keystrokes: The `let` is unnecessary in that
-the s-expression it binds could be plugged directly into the `recur` expression
-in place of `m-cur`. Within the `loop`, calls are made to the next function,
-`sets-loop`.
+is used in the template creation to represent one of $\pm\infty$. It creates
+`template` as a vector of `nil` values with `s` in the `start` slot, `sets` as
+the indexed collection of subsets, and `m-prev` as the initial "previous" row
+of the DP matrix. The `loop` construct runs `m` from 1 to *n* (inclusive) and
+carries over `m-prev` between iterations. This is a place where I could have
+save some keystrokes: The `let` is unnecessary in that the s-expression it
+binds could be plugged directly into the `recur` expression in place of
+`m-cur`. Within the `loop`, calls are made to the next function, `sets-loop`.
 
 The `sets-loop` function performs what is the middle of the three loops
 described by the DP algorithm. It takes the aggregate function `f`, the
@@ -428,15 +423,15 @@ index `j`. The new value is the result of calling `f-val-over-s` with the group
 of parameters.
 
 `f-val-over-s` is the *actual* innermost loop. In the textbook illustration of
-the algorithm it is simply listed as a "minimum" operation over a function
+the algorithm it is simply listed as a "min" operation over a function
 performed on all elements of the set (minus the `j` value). This is done by
 using `disj` to take `j` out of `s` (creating `s'`) and iterating over those
 elements (again, assigning `elements` was for readability and could have been
 skipped, as could the sorting of the elements of `s'`). A list of values is
-created based on the edge-weight for *(j, k)* and the value in the previous
-row for `s` and `k`. The aggregate function `f` is applied to the final list
-of values, and this value is returned. In the original TSP code, this function
-was valled `min-val-over-s` since the operation was always `min`. Here it is
+created based on the edge-weight for *(j, k)* and the value in the previous row
+for `s` and `k`. The aggregate function `f` is applied to the final list of
+values, and this value is returned. In the original TSP code, this function was
+valled `min-val-over-s` since the operation was always `min`. Here it is
 parameterized as `f`.
 
 ### The (small) `tsp` function
@@ -500,3 +495,8 @@ What matters, is that even running the DP algorithm *n* times, for a value of
 *n = 8* it took only 10% of the time that the brute-force algorithm did. As *n*
 grows, this gap will become much more pronounced, as the brute force will be
 bounded by O(*n!*) while the DP code will be bounded by O(*n<sup>3</sup>*).
+
+I am a little "itchy" about the number of parameters passed down from loop to
+loop, between `tsp` and `f-val-over-s`. There may be better ways to do this,
+with either `letfn` or lexical bindings. More and better familiarity with
+Clojure will be key, here.
