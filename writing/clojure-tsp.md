@@ -1,8 +1,8 @@
 # Clojure, Advent of Code, and the Traveling Salesman
 
-Date: `Wed Nov 29 12:56:02 MST 2023`
+Date: `Sat Dec  2 11:04:08 MST 2023`
 
-Tags: #clojure #advent #algorithms #tsp
+Tags: #clojure #adventofcode #algorithms #tsp
 
 ## Introduction
 
@@ -82,7 +82,7 @@ The basic gist of the algorithm, as applied to TSP, is:
 
 In this case, it should have been enough to take the lowest-score (shortest)
 path while skipping the "return segment back to $v$" step. Such was not part of
-the puzzle. This is what I had done, but it had given the wrong answer.
+the puzzle. I had done this, but it had given the wrong answer.
 
 (There will be more detail here, filled in at a later point.)
 
