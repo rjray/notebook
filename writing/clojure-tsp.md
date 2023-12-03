@@ -1,6 +1,6 @@
 # Clojure, Advent of Code, and the Traveling Salesman
 
-Date: `Sat Dec  2 11:04:08 MST 2023`
+Date: `Sun Dec  3 10:13:16 MST 2023`
 
 Tags: #clojure #adventofcode #algorithms #tsp
 
@@ -146,9 +146,10 @@ information: the correct answer.
 Using a variety of debugging approaches, both interjected `(prn ...)`
 statements and the [CIDER](https://cider.mx/) step-wise debugger, I walked
 through the code time and time again. After I-don't-know-how-many iterations,
-something hit me: the code was producing the $n-1$ candidate paths (starting at
-vertex 1) and picking the shortest of them (without adding a link back to the
-starting vertex). But what if the correct solution *doesn't* start at 1?
+something hit me: the code was correctly producing the $n-1$ candidate paths
+(starting at vertex 1) and correctly picking the shortest of them (without
+adding a link back to the starting vertex)... but what if the correct solution
+*doesn't* start at 1?
 
 ### The problem
 
@@ -175,7 +176,7 @@ and
 Clearly, these are the same 4 pairs and will result in the same sum of
 edge-costs.
 
-But this puzzle doesn't close the loop. Without that, `(1 2 3 4)` and `(3 4 1
+But this puzzle *doesn't close the loop*. Without that, `(1 2 3 4)` and `(3 4 1
 2)` do not yield the same costs. I can no longer arbitrarily start at 1 and
 expect it to give the correct answer.
 
@@ -428,7 +429,7 @@ performed on all elements of the set (minus the `j` value). This is done by
 using `disj` to take `j` out of `s` (creating `s'`) and iterating over those
 elements (again, assigning `elements` was for readability and could have been
 skipped, as could the sorting of the elements of `s'`). A list of values is
-created based on the edge-weight for *(j, k)* and the value in the previous row
+created based on the edge-weight for $(j, k)$ and the value in the previous row
 for `s` and `k`. The aggregate function `f` is applied to the final list of
 values, and this value is returned. In the original TSP code, this function was
 valled `min-val-over-s` since the operation was always `min`. Here it is
@@ -492,9 +493,11 @@ for the DP/Bellman-Ford solution. The latter could be squeezed a bit at the
 expense of readability, but I am not motivated by code-golfing.
 
 What matters, is that even running the DP algorithm $n$ times, for a value of
-*n = 8* it took only 10% of the time that the brute-force algorithm did. As $n$
+$n=8$ it took only 10% of the time that the brute-force algorithm did. As $n$
 grows, this gap will become much more pronounced, as the brute force will be
-bounded by O($n!$) while the DP code will be bounded by O($n^3$).
+bounded by O($n!$) while the DP code will be bounded by O($n^4$) (when
+accounting for the additional loop over $n$ for testing all vertices). The
+cross-over where DP is more efficient occurs at $n=7$.
 
 I am a little "itchy" about the number of parameters passed down from loop to
 loop, between `tsp` and `f-val-over-s`. There may be better ways to do this,
