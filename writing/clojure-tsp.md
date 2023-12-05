@@ -479,10 +479,10 @@ Running the above parts is done through the pre-defined functions `part-1` and
        (tsp max Integer/MIN_VALUE)))
 ```
 
-These are identical aside from their very last s-expressions. For part 1, we
-want the minimum-cost path so the aggregate function is `min` and the
-$+\infty$ value is `Integer/MAX_VALUE`. For part 2, we want the maximum-cost
-path. So the aggregate is `max` and the $-\infty$ value is `Integer/MIN_VALUE`.
+These are identical aside from their very last s-expressions. For part 1 we
+want the minimum-cost path; the aggregate function is `min` and the $+\infty$
+value is `Integer/MAX_VALUE`. For part 2, we want the maximum-cost path. So the
+aggregate is `max` and the $-\infty$ value is `Integer/MIN_VALUE`.
 
 ## Final Thoughts
 
