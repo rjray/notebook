@@ -142,7 +142,7 @@
        (map parse-line)
        build-graph
        ;; Part 1 calls for the minimum path. So we pass `min` as the reducer
-       ;; function and `Integer/MAX_VALUE` in place of +Infinity.
+       ;; function and `Integer/MAX_VALUE` in place of +∞.
        (tsp min Integer/MAX_VALUE)))
 
 (defn part-2
@@ -153,5 +153,5 @@
        (map parse-line)
        build-graph
        ;; Part 2 calls for the maximum path. So we pass `max` as the reducer
-       ;; function and `Integer/MIN_VALUE` in place of -Infinity.
+       ;; function and `Integer/MIN_VALUE` in place of -∞.
        (tsp max Integer/MIN_VALUE)))
