@@ -1,6 +1,6 @@
 # Clojure, Advent of Code, and the Traveling Salesman
 
-Date: `Sun Dec  3 10:13:16 MST 2023`
+Date: `Mon Dec 18 05:28:36 PM PST 2023`
 
 Tags: #clojure #adventofcode #algorithms #tsp
 
@@ -13,7 +13,7 @@ for graduate classes in my MSCS program). I use AoC to practice my skills in
 the [Clojure](http://clojure.org/) programming language (a Lisp dialect written
 in Java and running on the JVM).
 
-The 2023 challenge will be well underway by the time I publish this. I
+The 2023 challenge will be almost finished by the time I publish this. I
 generally have a problem early on in my effort: I don't get to use Clojure
 throughout the year, so each December I feel like I'm practically starting
 over. I spend the first few days madly going through the
@@ -30,7 +30,7 @@ could. The goals I set for this were:
   use, to make it more efficient and usable
 * Look for any new snippets, etc. that I can add to my "toolkit" for use in
   future challenges
-  
+
 So everything was steaming along nicely in my run of 2015... until I hit Day 9.
 
 ## The 2015 Day 9 Problem
@@ -48,7 +48,7 @@ assignments in Clojure, and I still had the code!
 
 I pulled out the [TSP solution I had originally written](clojure-tsp/tsp.clj)
 and began to examine it to remember what I had done. This implementation used
-a dynamic programming approach with a variation of the [Bellman-Ford
+a dynamic programming approach with a format based on the [Bellman-Ford
 algorithm](https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm).
 
 Remembering what I did that far back was it's own challenge, of course. There
@@ -75,16 +75,31 @@ The basic gist of the algorithm, as applied to TSP, is:
 1. Choose a vertex $v$ as the starting point. In the original code, vertices
    are numbered from 1 to $n$, so for the sake of easier looping the first
    vertex (1) is chosen.
-2. Use DP/Bellman-Ford to find the shortest paths rooted at $v$. There will be
-   $n-1$ different candidate paths.
+2. Use the Bellman-Ford-inspired DP approach to find the shortest paths rooted
+   at $v$. There will be $n-1$ different candidate paths.
 3. Over the paths from the previous step, find the shortest path that includes
    a return segment back to $v$.
 
-In this case, it should have been enough to take the lowest-score (shortest)
-path while skipping the "return segment back to $v$" step. Such was not part of
-the puzzle. I had done this, but it had given the wrong answer.
+Here is the basic pseudo-code (using bullet-points for indentation so I can
+still use math symbols):
 
-(There will be more detail here, filled in at a later point.)
+Let $A$ be a 2-dimensional array, indexed by subsets $S \subseteq \{1..n\}$ that
+contain 1 and destinations $j \in \{1..n\}$
+
+* (Base case) $A[S,1] = \bigl\{ 0~if~S = \{1\},~+\infty~otherwise \bigr\}$
+* for $m$ = 2..$n$:
+  * for each set $S \subseteq \{1 .. n\}$ of size $m$ that contains 1:
+    * for each $j \in S,~j \ne 1$:
+      * $A[S,j] = \min_{k \in S, k \ne j} \bigl\{ A[S-\{j\},k] + C_{kj} \bigr\}$
+    * end
+  * end
+* end
+* Return $\min_{j = 2..n} \bigl\{ A[\{1,2,3,..,n\},j] + C_{j1} \bigr\}$
+
+In this case, it should have been enough to take the lowest-score (shortest)
+path while skipping the "return segment back to $v$" step (since a return
+segment was not part of the puzzle). I had done this, but it had given the
+wrong answer.
 
 ## Back to the Advent Problem: Going Brute Force
 
@@ -256,7 +271,7 @@ These are basic boilerplate lines. The namespace is declared, followed by a
 * `clojure.string` provides string-utilities that will be used here (`split`)
 * `clojure.math.combinatorics` is a third-party library that provides a range
   of mathematical/combinatorics primitives
-  
+
 The combinatorics library is one that gets a lot of use in every year of AoC.
 
 ### Setting up the data
