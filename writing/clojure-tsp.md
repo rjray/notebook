@@ -86,15 +86,15 @@ still use math symbols):
 Let $A$ be a 2-dimensional array, indexed by subsets $S \subseteq \{1..n\}$ that
 contain 1 and destinations $j \in \{1..n\}$
 
-* (Base case) $A[S,1] = \bigl\{ 0~if~S = \{1\},~+\infty~otherwise \bigr\}$
-* for $m$ = 2..$n$:
+* (Base case) $A[S,1] = \bigl\\{ 0\~if\~S = \{1\},\~+\infty\~otherwise \bigr\\}$
+* for $m$ = 2..$`n`$:
   * for each set $S \subseteq \{1 .. n\}$ of size $m$ that contains 1:
-    * for each $j \in S,~j \ne 1$:
-      * $A[S,j] = \min_{k \in S, k \ne j} \bigl\{ A[S-\{j\},k] + C_{kj} \bigr\}$
+    * for each $j \in S,\~j \ne 1$:
+      * $A[S,j] = \min_{k \in S, k \ne j} \bigl\\{ A[S-\{j\},k] + C_{kj} \bigr\\}$
     * end
   * end
 * end
-* Return $\min_{j = 2..n} \bigl\{ A[\{1,2,3,..,n\},j] + C_{j1} \bigr\}$
+* Return $\min_{j = 2..n} \bigl\\{ A[\{1,2,3,..,n\},j] + C_{j1} \bigr\\}$
 
 In this case, it should have been enough to take the lowest-score (shortest)
 path while skipping the "return segment back to $v$" step (since a return
