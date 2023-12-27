@@ -1,8 +1,8 @@
 # Clojure, Advent of Code, and the Traveling Salesman
 
-Date: `Mon Dec 18 05:28:36 PM PST 2023`
+Date: `Tue Dec 26 21:53:05 CST 2023`
 
-Tags: #clojure #adventofcode #algorithms #tsp
+Tags: `#clojure` `#adventofcode` `#aoc` `#algorithms` `#tsp`
 
 ## Introduction
 
@@ -13,13 +13,14 @@ for graduate classes in my MSCS program). I use AoC to practice my skills in
 the [Clojure](http://clojure.org/) programming language (a Lisp dialect written
 in Java and running on the JVM).
 
-The 2023 challenge will be almost finished by the time I publish this. I
-generally have a problem early on in my effort: I don't get to use Clojure
-throughout the year, so each December I feel like I'm practically starting
-over. I spend the first few days madly going through the
+The 2023 challenge will be done and in the books by the time I publish this. I
+generally have a common problem early on in each year's effort: I don't get to
+use Clojure throughout the year, so each December I feel like I'm practically
+starting over. I spend the first few days madly going through the
 [documentation](https://clojuredocs.org/) to re-learn what I had been
-comfortable with a year earlier. It's frustrating, of course, and it slows me
-down on the early days that should be the easiest.
+comfortable with a year earlier. And even into the later days, I'm still
+reaching for docs far more often than I should be. It's frustrating, of course,
+and it slows me down (especially on the early days that should be the easiest).
 
 With this in mind, I decided to do a "practice run" this year prior to the
 start of the new challenge. I chose to do 2015 (the first year) as fast as I
@@ -35,13 +36,12 @@ So everything was steaming along nicely in my run of 2015... until I hit Day 9.
 
 ## The 2015 Day 9 Problem
 
-The [day 9 puzzle](https://adventofcode.com/2015/day/9) for this year was to
-take a set of towns, the distances between each pair, and find the shortest
-path that will visit all towns. Sound familiar? It's better known as the
-["Traveling Salesman
-Problem"](https://en.wikipedia.org/wiki/Travelling_salesman_problem). This made
-me enthusiastic, as I had written Clojure code for solving the TSP many years
-ago when I was working through the 4-course [Algorithms
+The [day 9 puzzle](https://adventofcode.com/2015/day/9) for 2015 was to take a
+set of towns, the distances between each pair, and find the shortest path that
+will visit all towns. Sound familiar? It's better known as the ["Traveling
+Salesman Problem"](https://en.wikipedia.org/wiki/Travelling_salesman_problem).
+This made me enthusiastic, as I had written Clojure code for solving the TSP
+many years ago when I was working through the 4-course [Algorithms
 Specialization](https://www.coursera.org/specializations/algorithms) from
 Coursera. I had completed all 4 courses while writing all the programming
 assignments in Clojure, and I still had the code!
@@ -61,7 +61,7 @@ the number should just be higher than what I had. I spent time running the
 algorithm by hand with pencil and paper, and decided that it must be the
 correct answer.
 
-It wasn't the correct answer. In fact, it was *too high!*
+It wasn't the correct answer. In fact, it was *too high.*
 
 ## Explanation of the Algorithm
 
@@ -146,7 +146,7 @@ time and effort to recognize that two permutations that are exact reverses of
 each other would have the same cost. This would have required caching each
 permutation and not calculating a cost for any permutation in which `(reverse
 p)` was already in the cache. But the `calc-cost` function was not the biggest
-source of processing time, the calculation and iteration of 8! permutations
+source of processing time, the calculation and iteration of $8!$ permutations
 was. Add in the overhead of maintaining the cache and testing each element for
 presence, and it probably would not have saved any significant amount of time.)
 
@@ -192,7 +192,7 @@ Clearly, these are the same 4 pairs and will result in the same sum of
 edge-costs.
 
 But this puzzle *doesn't close the loop*. Without that, `(1 2 3 4)` and `(3 4 1
-2)` do not yield the same costs. I can no longer arbitrarily start at 1 and
+2)` do **not** yield the same costs. I can no longer arbitrarily start at 1 and
 expect it to give the correct answer.
 
 ### The solution
@@ -200,8 +200,8 @@ expect it to give the correct answer.
 To address this, the only approach I could think of was to iterate over the DP
 algorithm for each vertex as a starting point. I would then take the minimum
 (or maximum, for part 2) resulting cost. This sounds very brute-force-ish, I
-will admit. But I suspected that even running the full DP process $n$ times
-should still out-perform the original solution.
+admit. But I suspected that even running the full DP process $n$ times should
+still out-perform the original solution.
 
 This lead to the file [day09bis.clj](clojure-tsp/day09bis.clj). The hardest
 part of this was re-factoring the primary steps and loops to deal with the
@@ -268,7 +268,7 @@ These are basic boilerplate lines. The namespace is declared, followed by a
 `require` of three different packages:
 
 * `advent-of-code.utils` is my grab-bag of utility code for AoC
-* `clojure.string` provides string-utilities that will be used here (`split`)
+* `clojure.string` provides a string-utility that will be used here (`split`)
 * `clojure.math.combinatorics` is a third-party library that provides a range
   of mathematical/combinatorics primitives
 
@@ -348,18 +348,18 @@ starting vertex $m$.
 
 The `create-sets` function is a subtle part of what makes Clojure such a
 well-suited language for this problem. Here, we create all the subsets of $S$
-($S = \lbrace0, ..., n-1\rbrace$), but we only create the ones that
-contain $m$. This is done by creating all sets without $m$, then `cons`'ing $m$
-into all of these. The resulting sequence of sets is then grouped by the count
-of their elements. The `reduce` block converts that result into a vector such
-that each index $i$ points to all sets that have $i+1$ elements, accounting for
-$m$.
+($S = \lbrace0, ..., n-1\rbrace$), but we only create the ones that contain
+$m$. This is done by creating all sets without $m$, then `cons`'ing $m$ into
+all of these. The resulting sequence of sets is then grouped by the count of
+elements. The `reduce` block converts that result into a vector such that each
+index $i$ points to all sets that have $i+1$ elements, accounting for $m$.
 
-Next, `create-column` creates a single colum for the matrix that would be used
+Next, `create-column` creates a single column for the matrix that would be used
 for the DP approach. It takes `sets` and `template`, and creates a
 pseudo-vector of all the sets (as indices) pointing to copies of `template`.
-The purpose of this will be explained more, later. Note that this is actually a
-map structure rather than a vector, so that a set can be used as the index.
+The purpose of this will be explained in more detail later. Note that this is
+actually a map structure rather than a vector, so that a set can be used as the
+index.
 
 Lastly, `get-final-answer` finds the correct answer (for the iteration of TSP).
 Here, `f` is the aggregate function to be applied to the collected totals.
@@ -432,11 +432,10 @@ of $S$ based on the value of $m$ in the previous function's loop, and finally
 the edge weights. With all of this, it just `loop`'s over the list of sets,
 calling the `j-loop` function for each individual set in the list.
 
-In the textbook expression of the algorithm, `j-loop` is the innermost loop. It
-loops over the elements of the set `s` that *aren't* the start-vertex `st`. For
-each of these, the `m-cur` row is updated for set-index `s` and integer
-index `j`. The new value is the result of calling `f-val-over-s` with the group
-of parameters.
+In the textbook algorithm, `j-loop` is the innermost loop. It loops over the
+elements of the set `s` that *aren't* the start-vertex `st`. For each of these,
+the `m-cur` row is updated for set-index `s` and integer index `j`. The new
+value is the result of calling `f-val-over-s` with the group of parameters.
 
 `f-val-over-s` is the *actual* innermost loop. In the textbook illustration of
 the algorithm it is simply listed as a "min" operation over a function
@@ -501,19 +500,39 @@ aggregate is `max` and the $-\infty$ value is `Integer/MIN_VALUE`.
 
 ## Final Thoughts
 
-Using the [sloc](https://github.com/flosse/sloc#readme) tool, I looked at the
-basic size of the solutions: 41 lines for the brute-force solution and 87 lines
-for the DP/Bellman-Ford solution. The latter could be squeezed a bit at the
-expense of readability, but I am not motivated by code-golfing.
+Using the [sloc](https://github.com/flosse/sloc) tool, I looked at the basic
+size of the solutions: 41 lines for the brute-force solution and 87 lines for
+the DP/Bellman-Ford solution. The latter could be squeezed a bit at the expense
+of readability, but I am not motivated by code-golfing.
 
 What matters, is that even running the DP algorithm $n$ times, for a value of
 $n=8$ it took only 10% of the time that the brute-force algorithm did. As $n$
 grows, this gap will become much more pronounced, as the brute force will be
 bounded by O($n!$) while the DP code will be bounded by O($n^4$) (when
 accounting for the additional loop over $n$ for testing all vertices). The
-cross-over where DP is more efficient occurs at $n=7$.
+cross-over where DP becomes efficient occurs at $n=7$.
 
 I am a little "itchy" about the number of parameters passed down from loop to
 loop, between `tsp` and `f-val-over-s`. There may be better ways to do this,
-with either `letfn` or lexical bindings. More and better familiarity with
-Clojure will be key, here.
+with either `letfn`, `partial`, or lexical bindings. More and better
+familiarity with Clojure will be key, here.
+
+## Epilogue: Post-AoC 2023
+
+Though I started the first draft of this well prior to the start of the 2023
+Advent of Code, I'm putting the final polish on it just after Christmas Day,
+after completing the 2023 series of puzzles.
+
+My code from the Coursera series came into play this year, as well. For the Day
+25 challenge, we needed to compute a [minimum
+cut](https://en.wikipedia.org/wiki/Minimum_cut) of a graph. For this, I reached
+back into the Coursera code, where I had implemented [Karger's
+algorithm](https://en.wikipedia.org/wiki/Karger%27s_algorithm). But I learned a
+harsh lesson: even generous code-comments can be of limited helpfulness if they
+are too general. It took me several hours to recall the structure of the
+algorithm and how the implementation worked. Once I had back-engineered the
+original work, it produced the correct answer (given enough iterations). But
+most of all, I found that most days went faster than they usually do (though
+there were still days that took a significant length of time). Interestingly, I
+*also* submitted more incorrect initial answers than previous years. But
+overall I would say that the practice-run was worth the time and effort.
