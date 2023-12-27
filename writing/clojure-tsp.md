@@ -534,11 +534,12 @@ algorithm, the data structures it built and used internally, and how the
 implementation actually worked. Once I had back-engineered the original work,
 it produced the correct answer (given enough iterations).
 
-Most of all, I observed that most days went faster than they usually do (though
-there were still days that took a significant length of time). While I still
-spent an inordinate amount of time looking up docs on various functions and
-built-ins, it was noticably less time spent than in past years. Still, I can't
-expect to use Clojure as smoothly and seamlessly as I used to use Perl; I had
-over 25 years of constant use of Perl, where I only get to code in Clojure for
-a few weeks out of each year. That is something I'll want to work on in the new
-year. Overall I would say that the practice-run was worth the time and effort.
+But most of all, I observed that most days went faster than they usually do
+(though there were still days that took a significant length of time). While I
+still spent an inordinate amount of time looking up docs on various functions
+and built-ins, it was noticeably less time spent than in past years. And I
+can't expect to use Clojure as smoothly and seamlessly as I used to use Perl; I
+had over 25 years of constant use of Perl, where I (currently) only get to code
+in Clojure for a few weeks out of each year. That is something I'll want to
+work on in the new year. Overall, though, I would say that the practice-run was
+worth the time and effort.
