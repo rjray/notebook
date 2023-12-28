@@ -55,7 +55,7 @@ Remembering what I did that far back was it's own challenge, of course. There
 are some comments in that code, but never enough. After a bit, though, I had
 determined what I needed to do in order to adapt the code to the input for the
 AoC puzzle. After some adjustments, I ran it on the example given in the puzzle
-and go the correct answer. I then ran it on the puzzle input and looked at the
+and got the correct answer. I then ran it on the puzzle input and looked at the
 result; it felt too low. There were 8 towns in the dataset, and it seemed like
 the number should just be higher than what I had. I spent time running the
 algorithm by hand with pencil and paper, and decided that it must be the
